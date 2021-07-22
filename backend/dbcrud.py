@@ -1,6 +1,5 @@
 from pymongo import MongoClient, database
 from bson.objectid import ObjectId
-# ESTE ES EL QUE FUNCIONA POR NADA DEL MUNDO BORRAR NADA!!!!!!!!!
 
 
 # function to return the database from the connection to mongo.
@@ -12,7 +11,6 @@ def connect_to_db():
     database = "testing"
     client = MongoClient(
         "mongodb://{}:{}@{}:{}".format(user, password, host, port))
-    #print("succesfully conected!")
     return client[database]
 
 
@@ -30,13 +28,13 @@ def insert(data):
 
 
 # function to get all the documents from the collection companiesdata
-def get_all_data():
+def get_all():
     database = connect_to_db()
     return database.companiesdata.find()
 
 
 # function to update the document from the given id.
-def update_data(id, data):
+def update(id, data):
     database = connect_to_db()
     resultado = database.companiesdata.update_one(
         {   # maybe change it for uuid or something else
@@ -51,27 +49,33 @@ def update_data(id, data):
                 "values": data.values,
             }
         })
-    return "Number of documents modified: "+resultado.modified_count
+    return "Number of documents modified: " + str(resultado.modified_count)
 
 
-def delete_data(id):
+def delete(id):
     database = connect_to_db()
     document = database.companiesdata.delete_one(
         {
             '_id': ObjectId(id)
         }
     )
-
-
-def get_data_by_id(id):
-    database = connect_to_db()
-    document = database.companiesdata.find_one(
-        {
-            '_id': ObjectId(id)
-        }
-    )
     return document
 
+
+def get_by_id(id):
+    database = connect_to_db()
+    # try and catch to handle error if the given ID is wrong or not found in database
+    try:
+        document = database.companiesdata.find_one(
+            {
+                '_id': ObjectId(id)
+            }
+        )
+        if document:
+            return document
+    except:
+        return ""
+# print(get_data_by_id("60f9910287bb259af8f3a78e"))
 # print(insert())
 
 #product = Product("a", 4, 56)
