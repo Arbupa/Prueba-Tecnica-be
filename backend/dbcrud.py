@@ -52,6 +52,7 @@ def update(id, data):
     return "Number of documents modified: " + str(resultado.modified_count)
 
 
+# function to delete a document from the given ID.
 def delete(id):
     database = connect_to_db()
     document = database.companiesdata.delete_one(
@@ -62,6 +63,7 @@ def delete(id):
     return document
 
 
+# function to get the document from the given ID.
 def get_by_id(id):
     database = connect_to_db()
     # try and catch to handle error if the given ID is wrong or not found in database
@@ -75,13 +77,3 @@ def get_by_id(id):
             return document
     except:
         return ""
-# print(get_data_by_id("60f9910287bb259af8f3a78e"))
-# print(insert())
-
-#product = Product("a", 4, 56)
-
-# product.cantidad = 1
-# product.nombre = "Sal"
-# product.precio = 39
-# print(product)
-# print(insert(product))
