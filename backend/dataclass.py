@@ -3,6 +3,7 @@ import uuid
 import random
 
 
+# class to create and process all the information
 class Data:
 
     def __init__(self, name: str, description: str, symbol: str) -> None:
