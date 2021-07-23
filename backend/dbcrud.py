@@ -1,8 +1,9 @@
+# import all the libraries needed
 from pymongo import MongoClient, database
 from bson.objectid import ObjectId
 
 
-# function to return the database from the connection to mongo.
+# function to return the database from the connection to mongo established in docker container.
 def connect_to_db():
     host = "localhost"
     port = "4000"
@@ -16,7 +17,9 @@ def connect_to_db():
 
 # function to insert data in the database.
 def insert(data):
+    # get DB
     database = (connect_to_db())
+    # get Collection
     companiesdata = database.companiesdata
     return companiesdata.insert_one({
         "uuid": data.uuid,
@@ -35,9 +38,11 @@ def get_all():
 
 # function to update the document from the given id.
 def update(id, data):
+    # get DB
     database = connect_to_db()
+    # get Collection
     resultado = database.companiesdata.update_one(
-        {   # maybe change it for uuid or something else
+        {
             '_id': ObjectId(id)
         },
         {

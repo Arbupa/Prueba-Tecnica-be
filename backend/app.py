@@ -1,24 +1,34 @@
+# import all the libraries needed
 from flask import Flask
 from flask.globals import request
+from flask.helpers import make_response
 from flask.wrappers import Response
 from dbcrud import *
 from dataclass import Data
 from bson.json_util import dumps
+from flask_cors import CORS, cross_origin
 
-
+# Name of the flask app
 app = Flask(__name__)
+# Make accept Cross origin between frontend and backend.
+cors = CORS(app)
 
 
 # GET http method to get ALL data.
 @app.route('/companies', methods=['GET'])
 def get_all_data():
+    # store all data
     all_documents = get_all()
     # convert cursor mongo object to list
     documents_list = list(all_documents)
     # convert list to json
     json_documents = dumps(documents_list)
-
-    return json_documents, 200
+    # create a variable for response to user and adding CORS Headers
+    response = make_response(json_documents)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response, 200
 
 
 # POST http method to create and insert data.
@@ -48,6 +58,7 @@ def create_data():
     # the user cannot send an empty value.
     # all the errors returns a response code 400: BAD REQUEST
     if name == '' or description == '' or symbol == '':
+        # return error function
         return fill_all_fields()
 
     # if there are no errors, we create the object
@@ -56,7 +67,12 @@ def create_data():
     # then insert into database and print the id object
     print(str(insert(new_data)) + "  inserted succesfully")
 
-    return 'The data was succesfully added', 200
+    # create a variable for response to user and adding CORS Headers
+    response = make_response('The data was succesfully added')
+    response.headers.add("Access-Control-Allow-Origin", " *")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response, 200
 
 
 # PUT http method to update with the new data.
@@ -107,7 +123,12 @@ def update_data(id):
         # then insert the new data into database and print the id object
         print(str(update(id, new_data)) + " document updated")
 
-        return 'The data was succesfully updated', 200
+        # create a variable for response to user and adding CORS Headers
+        response = make_response('The data was succesfully updated')
+        response.headers.add("Access-Control-Allow-Origin", " *")
+        response.headers.add("Access-Control-Allow-Headers", "*")
+        response.headers.add("Access-Control-Allow-Methods", "*")
+        return response, 200
     else:
         return not_found()
 
@@ -118,11 +139,16 @@ def delete_data(id):
     # first checks if the given id exists, if not return a message error.
     if get_by_id(id):
         print(delete(id))
-        return "Erased succesfully", 200
+        # create a variable for response to user and adding CORS Headers
+        response = make_response("Erased succesfully")
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "*")
+        response.headers.add("Access-Control-Allow-Methods", "*")
+        return response, 200
     return not_found()
 
 
-# Error to handle if not all the fields were filled
+# Error function to handle if not all the fields were filled
 @app.errorhandler(400)
 def fill_all_fields(error=None):
     message = {
@@ -130,13 +156,18 @@ def fill_all_fields(error=None):
         'message': 'Must fill all the fields.',
         'status': 400
     }
-
+    # show it on console
     print(message)
-    return message, 400
+    # create a variable for response to user and adding CORS Headers
+    response = make_response(message)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response, 400
 
 
 # Error to handle if the user tries to do a bad request.
-# For example, if he tries to delete or update an id not found.
+# For example, if he tries to delete or update action with an id not found.
 @app.errorhandler(404)
 def not_found(error=None):
     message = {
@@ -145,9 +176,16 @@ def not_found(error=None):
         'status': 404
     }
 
+    # print message error on console
     print(message)
-    return message, 400
+    # create a variable for response to user and adding CORS Headers
+    response = make_response(message)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response, 400
 
 
+# main function to start the local server
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
